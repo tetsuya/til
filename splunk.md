@@ -17,6 +17,12 @@ see: [sort - Splunk Documentation](https://docs.splunk.com/Documentation/Splunk/
 | chart stats count by status, host
 ```
 
+### timechart
+
+```
+| timechart count
+```
+
 see: [Search commands > stats, chart, and timechart | Splunk](https://www.splunk.com/en_us/blog/tips-and-tricks/search-commands-stats-chart-and-timechart.html)
 
 ## table
