@@ -13,3 +13,15 @@ $ ps aux | grep puma | awk '{print $2}'
 88136
 88135
 ```
+
+## -F 
+
+Set a field separator.
+
+```
+$ cat alphabet.csv
+a,b,c,d,e,f,g,h,i,j,k,l,m,l,o,p,q,r,s,t,u,v,w,x,y,z
+
+$ cat alphabet.csv | awk -F ',' '{print $3}'
+c
+```
