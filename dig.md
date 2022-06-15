@@ -7,120 +7,119 @@ $ dig tetsuya.dev
 ; <<>> DiG 9.10.6 <<>> tetsuya.dev
 ;; global options: +cmd
 ;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 3259
-;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 759
+;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1452
+; EDNS: version: 0, flags:; udp: 1232
 ;; QUESTION SECTION:
 ;tetsuya.dev.			IN	A
 
 ;; ANSWER SECTION:
-tetsuya.dev.		3596	IN	A	104.198.14.52
+tetsuya.dev.		300	IN	A	172.67.217.28
+tetsuya.dev.		300	IN	A	104.21.24.54
 
-;; Query time: 94 msec
-;; SERVER: 1.1.1.1#53(1.1.1.1)
-;; WHEN: Tue Jun 16 22:42:00 JST 2020
-;; MSG SIZE  rcvd: 67
+;; Query time: 79 msec
+;; SERVER: 2407:c800:7f01:2000:219:110:2:24#53(2407:c800:7f01:2000:219:110:2:24)
+;; WHEN: Wed Jun 15 06:36:41 UTC 2022
+;; MSG SIZE  rcvd: 72
 ```
 
-## +[no]all
+## Display only answer section
+```
+$ dig +noall +answer tetsuya.dev
+tetsuya.dev.		300	IN	A	172.67.217.28
+tetsuya.dev.		300	IN	A	104.21.24.54
+```
+
+### +[no]all
 Set or clear all display flags.
 
 ```
-$ dig tetsuya.dev +noall
+$ dig +noall tetsuya.dev
 
-; <<>> DiG 9.10.6 <<>> tetsuya.dev +noall
-;; global options: +cmd
 ```
 
-## +[no]answer
+### +[no]answer
 Control display of answer section.
 
 ```
-$ dig tetsuya.dev +noanswer
+$ dig +noanswer tetsuya.dev
 
-; <<>> DiG 9.10.6 <<>> tetsuya.dev +noanswer
+; <<>> DiG 9.10.6 <<>> +noanswer tetsuya.dev
 ;; global options: +cmd
 ;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 59989
-;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 6003
+;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1452
+; EDNS: version: 0, flags:; udp: 1232
 ;; QUESTION SECTION:
 ;tetsuya.dev.			IN	A
 
-;; Query time: 12 msec
-;; SERVER: 1.1.1.1#53(1.1.1.1)
-;; WHEN: Tue Jun 16 23:16:16 JST 2020
-;; MSG SIZE  rcvd: 67
-```
-
-### combination
-```
-$ dig tetsuya.dev +noall +answer
-
-; <<>> DiG 9.10.6 <<>> tetsuya.dev +noall +answer
-;; global options: +cmd
-tetsuya.dev.		2976	IN	A	104.198.14.52
-```
-
-## +[no]short
-Display nothing except short form of answer. `+noshort` is equivalent to `+all`
-
-```
-$ dig tetsuya.dev +short
-104.198.14.52
+;; Query time: 43 msec
+;; SERVER: 2407:c800:7f01:2000:219:110:2:24#53(2407:c800:7f01:2000:219:110:2:24)
+;; WHEN: Wed Jun 15 06:37:24 UTC 2022
+;; MSG SIZE  rcvd: 72
 ```
 
 ## Query type {A|MX|TXT|CNAME|NS}
 Query a specific DNS record type
 
 ```
-$ dig tetsuya.dev mx
+$ dig +short NS tetsuya.dev
+thomas.ns.cloudflare.com.
+jocelyn.ns.cloudflare.com.
+```
 
-; <<>> DiG 9.10.6 <<>> tetsuya.dev mx
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 887
-;; flags: qr rd ra; QUERY: 1, ANSWER: 5, AUTHORITY: 0, ADDITIONAL: 1
+### +[no]short
+Display answer in short form. `+noshort` is equivalent to `+all`
 
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1452
-;; QUESTION SECTION:
-;tetsuya.dev.			IN	MX
+```
+$ dig +short tetsuya.dev
+104.21.24.54
+172.67.217.28
+```
 
-;; ANSWER SECTION:
-tetsuya.dev.		3447	IN	MX	5 gmr-smtp-in.l.google.com.
-tetsuya.dev.		3447	IN	MX	10 alt1.gmr-smtp-in.l.google.com.
-tetsuya.dev.		3447	IN	MX	20 alt2.gmr-smtp-in.l.google.com.
-tetsuya.dev.		3447	IN	MX	30 alt3.gmr-smtp-in.l.google.com.
-tetsuya.dev.		3447	IN	MX	40 alt4.gmr-smtp-in.l.google.com.
+## Use different DNS server
 
-;; Query time: 19 msec
+You can specify a different server by using `@server`. This can be an IPv4 address, an IPv6 address, or the name of the server.
+
+```
+$ dig @thomas.ns.cloudflare.com. +noall +answer tetsuya.dev
+tetsuya.dev.		300	IN	A	172.67.217.28
+tetsuya.dev.		300	IN	A	104.21.24.54
+```
+
+### [Cloudflare Public DNS](https://www.cloudflare.com/ja-jp/learning/dns/what-is-1.1.1.1/)
+```
+$ dig @1.1.1.1 +noall +answer +stats tetsuya.dev
+tetsuya.dev.		300	IN	A	104.21.24.54
+tetsuya.dev.		300	IN	A	172.67.217.28
+;; Query time: 329 msec
 ;; SERVER: 1.1.1.1#53(1.1.1.1)
-;; WHEN: Tue Jun 16 22:59:39 JST 2020
-;; MSG SIZE  rcvd: 175
+;; WHEN: Wed Jun 15 06:40:20 UTC 2022
+;; MSG SIZE  rcvd: 72
 ```
 
-### combination
+### [Google Public DNS](https://developers.google.com/speed/public-dns)
 ```
-$ dig tetsuya.dev mx +short
-5 gmr-smtp-in.l.google.com.
-10 alt1.gmr-smtp-in.l.google.com.
-20 alt2.gmr-smtp-in.l.google.com.
-30 alt3.gmr-smtp-in.l.google.com.
-40 alt4.gmr-smtp-in.l.google.com.
+$ dig @8.8.8.8 +noall +answer +stats tetsuya.dev
+tetsuya.dev.		300	IN	A	172.67.217.28
+tetsuya.dev.		300	IN	A	104.21.24.54
+;; Query time: 92 msec
+;; SERVER: 8.8.8.8#53(8.8.8.8)
+;; WHEN: Wed Jun 15 06:40:30 UTC 2022
+;; MSG SIZE  rcvd: 72
 ```
 
 ## +[no]trace
 Shows the answer from each server used to resolve a domain name. `+notrace` is equivalent to `+all`
 
 ```
-$ dig tetsuya.dev +trace
+$ dig +trace tetsuya.dev
 
-; <<>> DiG 9.10.6 <<>> tetsuya.dev +trace
+; <<>> DiG 9.10.6 <<>> +trace tetsuya.dev
 ;; global options: +cmd
 .			511067	IN	NS	a.root-servers.net.
 .			511067	IN	NS	b.root-servers.net.
