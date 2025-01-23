@@ -1,5 +1,6 @@
-# dig
-domain information groper
+# Understanding dig Command Output
+
+The default output of `dig` contains several sections including the header, question section, answer section, authority section, and additional information. Let's break down each section and learn how to filter specific parts using options.
 
 ```
 $ dig tetsuya.dev
@@ -25,55 +26,39 @@ tetsuya.dev.		300	IN	A	104.21.24.54
 ;; MSG SIZE  rcvd: 72
 ```
 
-## Display only answer section
+## +cmd
+
+Shows the version of dig being used and the global options. This is useful for documentation and troubleshooting purposes as it explicitly shows which version and options are active.
+
+```
+$ dig +noall +cmd tetsuya.dev
+
+; <<>> DiG 9.10.6 <<>> +noall +cmd tetsuya.dev
+;; global options: +cmd
+```
+
+## +ques[tion]
+
+Displays only the question section of the dig output. This shows what exactly was queried, including the domain name, record class (typically IN for Internet), and record type (defaulting to A record if not specified).
+
+```
+$ dig +noall +ques tetsuya.dev
+;tetsuya.dev.                   IN      A
+```
+
+## +ans[wer]
+
+Shows only the answer section from the DNS response. This contains the actual DNS records returned by the server, including the TTL (Time To Live), record class, type, and value.
+
 ```
 $ dig +noall +answer tetsuya.dev
 tetsuya.dev.		300	IN	A	172.67.217.28
 tetsuya.dev.		300	IN	A	104.21.24.54
 ```
 
-### +[no]all
-Set or clear all display flags.
+## +short
 
-```
-$ dig +noall tetsuya.dev
-
-```
-
-### +[no]answer
-Control display of answer section.
-
-```
-$ dig +noanswer tetsuya.dev
-
-; <<>> DiG 9.10.6 <<>> +noanswer tetsuya.dev
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 6003
-;; flags: qr rd ra; QUERY: 1, ANSWER: 2, AUTHORITY: 0, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1232
-;; QUESTION SECTION:
-;tetsuya.dev.			IN	A
-
-;; Query time: 43 msec
-;; SERVER: 2407:c800:7f01:2000:219:110:2:24#53(2407:c800:7f01:2000:219:110:2:24)
-;; WHEN: Wed Jun 15 06:37:24 UTC 2022
-;; MSG SIZE  rcvd: 72
-```
-
-## Query type {A|MX|TXT|CNAME|NS}
-Query a specific DNS record type
-
-```
-$ dig +short NS tetsuya.dev
-thomas.ns.cloudflare.com.
-jocelyn.ns.cloudflare.com.
-```
-
-### +[no]short
-Display answer in short form. `+noshort` is equivalent to `+all`
+A simplified output format that only shows the essential answer data. This is particularly useful when scripting or when you only need the raw DNS values without any additional metadata.
 
 ```
 $ dig +short tetsuya.dev
@@ -81,17 +66,24 @@ $ dig +short tetsuya.dev
 172.67.217.28
 ```
 
-## Use different DNS server
+## +sta[ts]
 
-You can specify a different server by using `@server`. This can be an IPv4 address, an IPv6 address, or the name of the server.
+Displays timing and server statistics from the query. This includes query response time, which DNS server was used, when the query was made, and the size of the response message.
 
 ```
-$ dig @thomas.ns.cloudflare.com. +noall +answer tetsuya.dev
-tetsuya.dev.		300	IN	A	172.67.217.28
-tetsuya.dev.		300	IN	A	104.21.24.54
+$ dig +noall +stats tetsuya.dev
+;; Query time: 43 msec
+;; SERVER: 2407:c800:7f01:2000:219:110:2:24#53(2407:c800:7f01:2000:219:110:2:24)
+;; WHEN: Wed Jun 15 06:37:24 UTC 2022
+;; MSG SIZE  rcvd: 72
 ```
+
+## Use different DNS server (@server)
+
+The `@server` parameter allows you to query specific DNS servers directly. This is useful for testing different DNS providers or troubleshooting DNS propagation issues.
 
 ### [Cloudflare Public DNS](https://www.cloudflare.com/ja-jp/learning/dns/what-is-1.1.1.1/)
+
 ```
 $ dig @1.1.1.1 +noall +answer +stats tetsuya.dev
 tetsuya.dev.		300	IN	A	104.21.24.54
@@ -103,6 +95,7 @@ tetsuya.dev.		300	IN	A	172.67.217.28
 ```
 
 ### [Google Public DNS](https://developers.google.com/speed/public-dns)
+
 ```
 $ dig @8.8.8.8 +noall +answer +stats tetsuya.dev
 tetsuya.dev.		300	IN	A	172.67.217.28
@@ -113,8 +106,25 @@ tetsuya.dev.		300	IN	A	104.21.24.54
 ;; MSG SIZE  rcvd: 72
 ```
 
-## +[no]trace
-Shows the answer from each server used to resolve a domain name. `+notrace` is equivalent to `+all`
+## Query type {A|MX|TXT|CNAME|NS}
+
+You can query different types of DNS records by specifying the record type. Common types include:
+- A: IPv4 address records
+- MX: Mail exchange records
+- TXT: Text records (often used for verification)
+- CNAME: Canonical name records (aliases)
+- NS: Nameserver records
+
+```
+$ dig +short NS tetsuya.dev
+thomas.ns.cloudflare.com.
+jocelyn.ns.cloudflare.com.
+```
+
+## +trace
+
+Performs an iterative query that shows the complete DNS resolution process, starting from the root servers down to the authoritative nameserver for the domain. This is invaluable for understanding and troubleshooting the DNS resolution chain.
+
 
 ```
 $ dig +trace tetsuya.dev
